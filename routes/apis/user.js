@@ -159,27 +159,28 @@ router.post('/signin',(req,res)=>{
     })
 })
 
-router.post("/create_new_password", (req, res) => {
+router.post("/create_new_password", async (req, res) => {
   const user_id = req.body.user_id
   let password = req.body.password
 
-  bcrypt.hash(password, saltRounds, (err, hash) => {
-    let filter = { _id: user_id }
-
+  bcrypt.hash(password, saltRounds, async (err, hash) => {
+    let filter = { _id: user_id };
     let updateDoc = {
-      $set:{
-        password:hash
-      }
-    }
+      $set: {
+       
+       password:hash,
+      
+      
+      },
+    };
 
-    Users.updateMany(filter, updateDoc)
-
-    Users.findById(user_id).then(result => {
-      if(result){
-        res.send({
-          "msg":"Password Updated"
-        })
-      }
+    await Users.updateMany(filter,updateDoc)
+    Users.findById(user_id)
+    .then(result=>{
+     
+       res.send({
+         "msg":"Password Updated"
+       })
     })
 
   })
