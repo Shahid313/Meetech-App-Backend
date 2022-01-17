@@ -21,7 +21,7 @@ function send_mail(email,code){
 
 
   var mailOptions = {
-    from: 'theshoaibihsan9@gmail.com',
+    from: 'xyz.com',
     to: email,
     subject: 'Meetech Verification Code',
     text: 'Your Verification Code is : ' + code
