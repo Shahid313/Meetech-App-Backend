@@ -15,41 +15,57 @@ router.get('/get_all_items',(req,res)=>{
 
 router.get("/search_item",(req,res)=>{
     const {item_name,place_item_found,item_color,complete_address} = req.query
-    var lowerCase_item_name = item_name.toLowerCase()
-    var lowerCase_place_item_found = place_item_found.toLowerCase()
-    var lowerCase_item_color = item_color.toLowerCase()
+    
     if(complete_address != null){
-        var lowerCase_complete_address = complete_address.toLowerCase()
-        Item.findOne({$or: [ { item_name:lowerCase_item_name },{place_item_found:lowerCase_place_item_found},{complete_address:lowerCase_complete_address},{item_color:lowerCase_item_color} ]})
+        
+        Item.find({$and: [ {item_name:{ $regex:item_name, $options:'i' }},{place_item_found:{ $regex:place_item_found, $options:'i' }},{complete_address:{ $regex:complete_address, $options:'i' }},{item_color:{ $regex:item_color, $options:'i' }} ]})
     .then(item=>{
-        res.json({
-            "items":item
-        })
+        if(item != ''){
+            res.json({
+                "items":item,
+                "msg":"ItemFound"
+            })
+        }else{
+            res.json({
+                "msg":"ItemNotFound"
+            })
+        }
+        
     })
     }else{
-        Item.findOne({$or: [ { item_name:lowerCase_item_name },{place_item_found:lowerCase_place_item_found},{item_color:lowerCase_item_color} ]})
+        Item.find({$and: [ {item_name:{ $regex:item_name, $options:'i' }},{place_item_found:{ $regex:place_item_found, $options:'i' }},{item_color:{ $regex:item_color, $options:'i' }} ]})
     .then(item=>{
-        res.json({
-            "items":item
-        })
+        if(item != ''){
+            res.json({
+                "items":item,
+                "msg":"ItemFound"
+            })
+        }else{
+            res.json({
+                "msg":"ItemNotFound"
+            })
+        }
     })
-    }
+
+}
 })
 
 router.get("/search_item_by_keywords",(req,res)=>{
     const keywords = req.query.keywords
 
-    var lowecase_keywords = keywords.toLowerCase()
-
-    var keywords_regex = new RegExp(lowecase_keywords,'i')
-   
-    
-
-    Item.findOne({keywords:keywords_regex})
+    Item.find({keywords : {$regex: keywords,$options:'i'}})
     .then(item=>{
-        res.json({
-            "items":item
-        })
+        if(item != ''){
+            res.send({
+                "items":item,
+                 "msg":"ItemFound"
+            })
+        }else{
+            res.send({
+                "msg":"ItemNotFound"
+            })
+        }
+        
     })
 })
 
@@ -57,11 +73,7 @@ router.get("/search_item_by_keywords",(req,res)=>{
 router.post('/add_item',(req,res)=>{
     console.log("Item Added")
     const {item_name,mobile_no,place_item_found,item_color,keywords,complete_address,added_by_id} = req.body
-    var lowerCase_item_name = item_name.toLowerCase()
-    var lowerCase_place_item_found = place_item_found.toLowerCase()
-    var lowerCase_item_color = item_color.toLowerCase()
-    var lowerCase_complete_address = complete_address.toLowerCase()
-    var lowerCase_keywords = keywords.toLowerCase()
+
     const file = req.files.item_picture
     const filename=file.name
     console.log(filename)
@@ -72,12 +84,12 @@ router.post('/add_item',(req,res)=>{
     })
 
     const item = new Item({
-        "item_name":lowerCase_item_name,
-        "item_color":lowerCase_item_color,
+        "item_name":item_name,
+        "item_color":item_color,
         "item_picture":filename,
-        "place_item_found":lowerCase_place_item_found,
-        "complete_address":lowerCase_complete_address,
-        "keywords":lowerCase_keywords,
+        "place_item_found":place_item_found,
+        "complete_address":complete_address,
+        "keywords":keywords,
         "mobile_no":mobile_no,
         "user_id":added_by_id
     })
